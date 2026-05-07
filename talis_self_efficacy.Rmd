@@ -22,7 +22,7 @@ df_all <- haven::read_dta("ttgintt4.dta")
 ```
 
 ```{r}
-# replace missing values
+# replace missing values with R na to match the current missing values in Stata
 df <-  tagged_na_to_regular_na(df_all) 
 
 # make variable names lowercase
@@ -30,7 +30,6 @@ colnames(df) <- tolower(colnames(df))
 
 # subset data for mathematics and drop unused levels
 df <- df %>% filter(tt4g48a == 2)  %>% droplevels() 
-
 
 ```
 

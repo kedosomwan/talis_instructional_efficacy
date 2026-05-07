@@ -1,0 +1,86 @@
+---
+title: "Talis Self_efficacy"
+output: word_document
+date: "2026-03-18"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# load library and dataset
+```{r}
+# libraries
+library(tidyverse)
+library(jtools)
+library(gtsummary)
+library(mice)
+library(labelled)
+library(interactions)
+#data
+df_all <- haven::read_dta("ttgintt4.dta")
+```
+
+```{r}
+# replace missing values
+df <-  tagged_na_to_regular_na(df_all) 
+
+# make variable names lowercase
+colnames(df) <- tolower(colnames(df))
+
+# subset data for mathematics and drop unused levels
+df <- df %>% filter(tt4g48a == 2)  %>% droplevels() 
+
+
+```
+
+# Subset Data
+```{r}
+df_summ <- df %>% as_factor() %>% filter(tt4g48a== "Mathematics") %>% dplyr::select(idschool, idteach, t4seins, t4self, t4secls, cntry, tt4g49, tt4g07a, tt4g07b, tt4g04, t4tagegr, tt4g21a, tt4g21b, t4pdsubmp, starts_with("t4tyexp"), starts_with("trwgt")) %>%  mutate(instruct_eff = as.numeric(t4seins))
+                                                                                    #starts_with("tt4g47") for propotion of classes, 
+                                                                                   
+
+# drop missing outcomes
+df_summ <- df_summ %>% filter(!is.na(t4seins)) # only 50 missing
+
+# combine not at all and to some extent
+df_summ <- df_summ %>% mutate(content_prep = fct_collapse(tt4g07a, "Not at all / To some extent" = c("Not at all", "To some extent")),
+                    pedagogy_prep = fct_collapse(tt4g07b,"Not at all / To some extent" = c("Not at all", "To some extent")))
+
+df_summ <- df_summ %>% mutate(content_prep = fct_collapse(tt4g07a, "Not at all / To some extent" = c("Not at all", "To some extent")),
+                    pedagogy_prep = fct_collapse(tt4g07b,"Not at all / To some extent" = c("Not at all", "To some extent"))) %>% dplyr::select(-tt4g07a, -tt4g07b)
+```
+
+# Descriptive Statistics
+```{r}
+df_summ %>% dplyr::select(t4seins, tt4g49, content_prep, pedagogy_prep, t4tyexptt, t4tagegr, tt4g21a, tt4g21b) %>% tbl_summary(statistic = all_continuous() ~ "{mean} ({sd})") %>% as_flex_table()
+```
+
+
+
+# Multiple Imputation
+
+```{r}
+#start_time <- Sys.time()
+#df_imputed <- mice(df_summ, m = 5)
+#end_time <- Sys.time()
+#end_time - start_time
+#save(df_imputed, file = "df_imputed.rdata")
+load("df_imputed.rdata")
+```
+# Single Level Linear Regression
+```{r}
+library(survey)
+df_svy <- svydesign(data = df_summ, id =~cntry + idschool, probs = NULL, fpc = NULL, variables = NULL, repweights = "trwgt[1-100]+", type = "BRR")
+m_svy <- svyglm(design = df_svy, t4seins ~ content_prep*pedagogy_prep + t4tagegr + tt4g04 + tt4g21a*tt4g21b, family = gaussian())
+m_svy %>% tbl_regression() %>% add_significance_stars(hide_p = FALSE, hide_ci = FALSE) %>% as_flex_table()
+```
+
+# Instructional Self-Efficacy WITH WEIGHTS
+```{r}
+df_svy_imp <- svydesign(data = complete(df_imputed), id =~cntry + idschool, probs = NULL, fpc = NULL, variables = NULL, repweights = "trwgt[1-100]+", type = "BRR")
+imp_svy <- svyglm(design = df_svy, t4seins ~ content_prep*pedagogy_prep + t4tagegr + tt4g04 + tt4g21a*tt4g21b, family = gaussian())
+imp_svy %>% tbl_regression() %>% add_significance_stars(hide_p = FALSE, hide_ci = FALSE) %>% as_flex_table()
+```
+
+

@@ -50,7 +50,7 @@ df_summ <- df_summ %>% mutate(content_prep = fct_collapse(tt4g07a, "Not at all /
 
 # Descriptive Statistics
 ```{r}
-df_summ %>% dplyr::select(t4seins, content_prep, pedagogy_prep, tt4g24a, tt4g24b, t4tyexptt, t4tagegr, tt4g49, tt4g21a, tt4g21b) %>% tbl_summary(statistic = all_continuous() ~ "{mean} ({sd})") %>% as_flex_table()
+df_summ %>% dplyr::select(t4seins, content_prep, pedagogy_prep, tt4g24a, tt4g24b, t4tyexptt, t4tagegr, tt4g49, tt4g21a, tt4g21b, tt4g04) %>% tbl_summary(statistic = all_continuous() ~ "{mean} ({sd})") %>% as_flex_table()
 ```
 # Preliminary Analysis
 ```{r}
@@ -67,8 +67,9 @@ df_factor <- df_summ %>% as_factor()
 mlm1 <- lmer(t4seins ~ 
                content_prep * pedagogy_prep + # content and pedagogy interaction
                tt4g24a + tt4g24b + # need for PD
+              (4-tt4g49) + # reverse coded for if math included in formal training
+               tt4g21a + tt4g21b + # type of PD experiencing
                t4tyexptt + t4tagegr + tt4g04 +  # controls
-               tt4g21a + tt4g21b + # if have PD
                (1 | cntry), # using conuntry for robust standard error
              data = df_factor
 )
@@ -89,22 +90,25 @@ df_imputed <- mice(df_subset, m = 20)
 end_time <- Sys.time()
 end_time - start_time
 save(df_imputed, file = "df_imputed.rdata")
-load("df_imputed.rdata")
 ```
 
 ```{r}
+# load libraries
 library(lmerTest)
 library(lme4)
 library(jtools)
 library(gtsummary)
+
+# load imputed data
 
 # Two Level Model by Country - Instructional Self-Efficacy as Outcome
 
 mlm1_imp <- with(df_imputed, lmer(t4seins ~ 
                content_prep * pedagogy_prep + # content and pedagogy interaction
                tt4g24a + tt4g24b + # need for PD
+              (4-tt4g49) + # reverse coded for if math included in formal training
+               tt4g21a + tt4g21b + # type of PD experiencing
                t4tyexptt + t4tagegr + tt4g04 +  # controls
-               tt4g21a + tt4g21b + # if have PD
                (1 | cntry))) # using country for robust standard error
 
 tbl_regression(mlm1_imp) %>%

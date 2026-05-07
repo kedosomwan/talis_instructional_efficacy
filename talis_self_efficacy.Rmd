@@ -46,7 +46,6 @@ df_summ <- df_summ %>% mutate(content_prep = fct_collapse(tt4g07a, "Not at all /
 
 df_summ <- df_summ %>% mutate(content_prep = fct_collapse(tt4g07a, "Not at all / To some extent" = c("Not at all", "To some extent")),
                               pedagogy_prep = fct_collapse(tt4g07b,"Not at all / To some extent" = c("Not at all", "To some extent"))) %>%
-  dplyr::select(-tt4g07a, -tt4g07b)
 ```
 
 # Descriptive Statistics
@@ -62,18 +61,8 @@ library(gtsummary)
 
 df_factor <- df_summ %>% as_factor()
 
-# One Level Model
-m1 <- lm(data = df_factor, t4seins ~ as.numeric(tt4g07a)*as.numeric(tt4g07b) + t4tyexptt + t4tagegr + tt4g04 + tt4g21a + tt4g21b) 
-m1 %>% tbl_regression() %>% add_glance_source_note() %>% as_flex_table()
-summary(m1)
-
-# Null Multilevel Model
-mlm0 <- lmer(formula = t4seins ~  as.numeric(tt4g07a)*as.numeric(tt4g07b) + (1|cntry),  data = df_factor) 
-mlm0 %>% tbl_regression() %>% add_glance_source_note() %>% as_flex_table()
-summ(mlm0)
-start_time = Sys.time()
 # Two Level Model - Country - best fit model by AIC and BIC
-mlm1 <- lmer(formula = t4seins ~ as.numeric(tt4g07a)*as.numeric(tt4g07b) + t4tyexptt + t4tagegr + tt4g04 + tt4g21a + tt4g21b + (1|cntry),  data = df_factor) 
+mlm1 <- lmer(formula = t4seins ~ tt4g07a*tt4g07b + tt4g24a*tt4g24b + t4tyexptt + t4tagegr + tt4g04 + tt4g21a + tt4g21b + (1|cntry),  data = df_factor) 
 mlm1 %>% tbl_regression() %>% add_glance_source_note() %>% as_flex_table()
 summary(mlm1)
 end_time = Sys.time()

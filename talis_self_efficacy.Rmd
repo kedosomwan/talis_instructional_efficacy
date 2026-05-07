@@ -83,14 +83,36 @@ tbl_regression(mlm1) %>%
 
 ```{r eval = FALSE}
 #subset data
-##df_subset <- df %>% select(idschool, idteach, cntry, starts_with("t4se"), tt4g49, tt4g07a, tt4g07b, tt4g04, t4tagegr, starts_with("t4tyexp"), starts_with("tt4g47"))
-#start_time <- Sys.time()
-#df_imputed <- mice(df_summ, m = 5)
-#end_time <- Sys.time()
-#end_time - start_time
-#save(df_imputed, file = "df_imputed.rdata")
+df_subset <- df_factor %>% select(idschool, idteach, cntry, t4seins, content_prep, pedagogy_prep, tt4g24a, tt4g24b, t4tyexptt, t4tagegr, tt4g49, tt4g21a, tt4g21b)
+start_time <- Sys.time()
+df_imputed <- mice(df_subset, m = 20)
+end_time <- Sys.time()
+end_time - start_time
+save(df_imputed, file = "df_imputed.rdata")
 load("df_imputed.rdata")
 ```
+
+```{r}
+library(lmerTest)
+library(lme4)
+library(jtools)
+library(gtsummary)
+
+# Two Level Model by Country - Instructional Self-Efficacy as Outcome
+
+mlm1_imp <- with(df_imp, lmer(t4seins ~ 
+               content_prep * pedagogy_prep + # content and pedagogy interaction
+               tt4g24a + tt4g24b + # need for PD
+               t4tyexptt + t4tagegr + tt4g04 +  # controls
+               tt4g21a + tt4g21b + # if have PD
+               (1 | cntry))) # using country for robust standard error
+
+tbl_regression(mlm1_imp) %>%
+  add_significance_stars() %>% 
+  as_flex_table()
+```
+
+
 # Single Level Linear Regression
 ```{r eval = FALSE}
 library(survey)

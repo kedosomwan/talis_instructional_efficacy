@@ -67,7 +67,7 @@ df_factor <- df_summ %>% as_factor()
 mlm1 <- lmer(
   t4seins ~ content_prep * pedagogy_prep +
     tt4g24a + tt4g24b + t4tyexptt + t4tagegr +
-    tt4g04 + tt4g21a + tt4g21b +
+    tt4g04 +
     (1 | cntry),
   data = df_factor
 )
@@ -75,42 +75,6 @@ mlm1 <- lmer(
 tbl_regression(mlm1) %>%
   add_significance_stars() %>% 
   as_flex_table()
-
-# Two Level Model - Country - best fit model by AIC and BIC
-mlm2 <- lmer(
-  as.numeric(tt4g21a) ~ content_prep * pedagogy_prep +
-    tt4g24a + tt4g24b + t4tyexptt + t4tagegr +
-    tt4g04 +
-    (1 | cntry),
-  data = df_factor
-)
-
-tbl_regression(mlm2) %>%
-  add_significance_stars() %>% 
-  as_flex_table()
-
-# Two Level Model - Country - best fit model by AIC and BIC
-mlm3 <- lmer(
-  as.numeric(tt4g21b) ~ t4seins + content_prep * pedagogy_prep +
-    tt4g24a + tt4g24b + t4tyexptt + t4tagegr +
-    tt4g04 + 
-    (1 | cntry),
-  data = df_factor
-)
-
-tbl_regression(mlm3) %>%
-  add_significance_stars() %>% 
-  as_flex_table()
-
-## Two Level Model - School
-#mlm2 <- lmer(formula = t4seins ~ as.numeric(tt4g07a)*as.numeric(tt4g07b) + t4tyexptt + t4tagegr + tt4g04 + (1|idschool),  data = df_factor) 
-#mlm2 %>% tbl_regression() %>% add_glance_source_note() %>% as_flex_table()
-#summ(mlm2)
-
-## Three Level Model - is singular so fit issues
-#mlm3 <- lmer(formula = t4seins ~ as.numeric(tt4g07a)*as.numeric(tt4g07b) + t4tyexptt + t4tagegr + tt4g04 + (1|idschool/cntry), data = df_factor) 
-#mlm3 %>% tbl_regression() %>% add_glance_source_note() %>% as_flex_table()
-#summ(mlm3)
 ```
 
 

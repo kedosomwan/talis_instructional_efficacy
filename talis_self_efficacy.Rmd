@@ -50,7 +50,7 @@ df_summ <- df_summ %>% mutate(content_prep = fct_collapse(tt4g07a, "Not at all /
 
 # Descriptive Statistics
 ```{r}
-df_summ %>% dplyr::select(t4seins, tt4g49, content_prep, pedagogy_prep, t4tyexptt, t4tagegr, tt4g21a, tt4g21b, tt4g24a, tt4g24b) %>% tbl_summary(statistic = all_continuous() ~ "{mean} ({sd})") %>% as_flex_table()
+df_summ %>% dplyr::select(t4seins, content_prep, pedagogy_prep, tt4g24a, tt4g24b, t4tyexptt, t4tagegr, tt4g49) %>% tbl_summary(statistic = all_continuous() ~ "{mean} ({sd})") %>% as_flex_table()
 ```
 # Preliminary Analysis
 ```{r}
@@ -62,7 +62,7 @@ library(gtsummary)
 
 df_factor <- df_summ %>% as_factor()
 
-# Two Level Model - Country - best fit model by AIC and BIC
+# Two Level Model - Country - Instructional Self-Efficacy as Outcome
 
 mlm1 <- lmer(
   t4seins ~ content_prep * pedagogy_prep +

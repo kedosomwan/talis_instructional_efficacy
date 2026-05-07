@@ -80,7 +80,7 @@ tbl_regression(mlm1) %>%
 
 # Multiple Imputation
 
-```{r evaluate = FALSE}
+```{r eval = FALSE}
 #subset data
 ##df_subset <- df %>% select(idschool, idteach, cntry, starts_with("t4se"), tt4g49, tt4g07a, tt4g07b, tt4g04, t4tagegr, starts_with("t4tyexp"), starts_with("tt4g47"))
 #start_time <- Sys.time()
@@ -91,7 +91,7 @@ tbl_regression(mlm1) %>%
 load("df_imputed.rdata")
 ```
 # Single Level Linear Regression
-```{r evaluate = FALSE}
+```{r eval = FALSE}
 library(survey)
 df_svy <- svydesign(data = df_summ, id =~cntry + idschool, probs = NULL, fpc = NULL, variables = NULL, repweights = "trwgt[1-100]+", type = "BRR")
 m_svy <- svyglm(design = df_svy, t4seins ~ content_prep*pedagogy_prep + t4tagegr + tt4g04 + tt4g21a*tt4g21b, family = gaussian())
@@ -99,7 +99,7 @@ m_svy %>% tbl_regression() %>% add_significance_stars(hide_p = FALSE, hide_ci = 
 ```
 
 # Instructional Self-Efficacy WITH WEIGHTS
-```{r evaluate = FALSE}
+```{r eval = FALSE}
 df_svy_imp <- svydesign(data = complete(df_imputed), id =~cntry + idschool, probs = NULL, fpc = NULL, variables = NULL, repweights = "trwgt[1-100]+", type = "BRR")
 imp_svy <- svyglm(design = df_svy, t4seins ~ content_prep*pedagogy_prep + t4tagegr + tt4g04 + tt4g21a*tt4g21b, family = gaussian())
 imp_svy %>% tbl_regression() %>% add_significance_stars(hide_p = FALSE, hide_ci = FALSE) %>% as_flex_table()

@@ -1,7 +1,7 @@
 ---
-title: "Talis Self_efficacy"
+title: "Talis Instructional Self-Efficacy"
 output: word_document
-date: "2026-03-18"
+date: "`r Sys.Date()`"
 ---
 
 ```{r setup, include=FALSE}

@@ -53,12 +53,63 @@ df_summ <- df_summ %>% mutate(content_prep = fct_collapse(tt4g07a, "Not at all /
 ```{r}
 df_summ %>% dplyr::select(t4seins, tt4g49, content_prep, pedagogy_prep, t4tyexptt, t4tagegr, tt4g21a, tt4g21b, tt4g24a, tt4g24b) %>% tbl_summary(statistic = all_continuous() ~ "{mean} ({sd})") %>% as_flex_table()
 ```
+# Preliminary Analysis
+```{r}
+library(lme4)
+library(jtools)
+library(gtsummary)
 
+
+df_factor <- df_summ %>% as_factor()
+
+# One Level Model
+m1 <- lm(data = df_factor, t4seins ~ as.numeric(tt4g07a)*as.numeric(tt4g07b) + t4tyexptt + t4tagegr + tt4g04 + tt4g21a + tt4g21b) 
+m1 %>% tbl_regression() %>% add_glance_source_note() %>% as_flex_table()
+summary(m1)
+
+# Null Multilevel Model
+mlm0 <- lmer(formula = t4seins ~  as.numeric(tt4g07a)*as.numeric(tt4g07b) + (1|cntry),  data = df_factor) 
+mlm0 %>% tbl_regression() %>% add_glance_source_note() %>% as_flex_table()
+summ(mlm0)
+start_time = Sys.time()
+# Two Level Model - Country - best fit model by AIC and BIC
+mlm1 <- lmer(formula = t4seins ~ as.numeric(tt4g07a)*as.numeric(tt4g07b) + t4tyexptt + t4tagegr + tt4g04 + tt4g21a + tt4g21b + (1|cntry),  data = df_factor) 
+mlm1 %>% tbl_regression() %>% add_glance_source_note() %>% as_flex_table()
+summary(mlm1)
+end_time = Sys.time()
+end_time - start_time
+
+# Two Level Model - Country - best fit model by AIC and BIC
+mlm2 <- lmer(formula = t4seins ~ as.numeric(tt4g07a)*as.numeric(tt4g07b) + t4tyexptt + t4tagegr + tt4g04 + tt4g21a + tt4g21b + (1|cntry),  data = df_factor) 
+mlm2 %>% tbl_regression() %>% add_glance_source_note() %>% as_flex_table()
+summary(mlm1)
+end_time = Sys.time()
+end_time - start_time
+
+# Two Level Model - Country - best fit model by AIC and BIC
+mlm3 <- lmer(formula = t4seins ~ as.numeric(tt4g07a)*as.numeric(tt4g07b) + t4tyexptt + t4tagegr + tt4g04 + tt4g21a + tt4g21b + (1|cntry),  data = df_factor) 
+mlm3 %>% tbl_regression() %>% add_glance_source_note() %>% as_flex_table()
+summary(mlm1)
+end_time = Sys.time()
+end_time - start_time
+
+## Two Level Model - School
+#mlm2 <- lmer(formula = t4seins ~ as.numeric(tt4g07a)*as.numeric(tt4g07b) + t4tyexptt + t4tagegr + tt4g04 + (1|idschool),  data = df_factor) 
+#mlm2 %>% tbl_regression() %>% add_glance_source_note() %>% as_flex_table()
+#summ(mlm2)
+
+## Three Level Model - is singular so fit issues
+#mlm3 <- lmer(formula = t4seins ~ as.numeric(tt4g07a)*as.numeric(tt4g07b) + t4tyexptt + t4tagegr + tt4g04 + (1|idschool/cntry), data = df_factor) 
+#mlm3 %>% tbl_regression() %>% add_glance_source_note() %>% as_flex_table()
+#summ(mlm3)
+```
 
 
 # Multiple Imputation
 
 ```{r}
+#subset data
+##df_subset <- df %>% select(idschool, idteach, cntry, starts_with("t4se"), tt4g49, tt4g07a, tt4g07b, tt4g04, t4tagegr, starts_with("t4tyexp"), starts_with("tt4g47"))
 #start_time <- Sys.time()
 #df_imputed <- mice(df_summ, m = 5)
 #end_time <- Sys.time()

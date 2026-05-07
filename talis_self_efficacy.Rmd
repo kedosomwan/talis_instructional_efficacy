@@ -54,6 +54,7 @@ df_summ %>% dplyr::select(t4seins, tt4g49, content_prep, pedagogy_prep, t4tyexpt
 ```
 # Preliminary Analysis
 ```{r}
+library(lmerTest)
 library(lme4)
 library(jtools)
 library(gtsummary)
@@ -62,11 +63,18 @@ library(gtsummary)
 df_factor <- df_summ %>% as_factor()
 
 # Two Level Model - Country - best fit model by AIC and BIC
-mlm1 <- lmer(formula = t4seins ~ tt4g07a*tt4g07b + tt4g24a*tt4g24b + t4tyexptt + t4tagegr + tt4g04 + tt4g21a + tt4g21b + (1|cntry),  data = df_factor) 
-mlm1 %>% tbl_regression() %>% add_glance_source_note() %>% as_flex_table()
-summary(mlm1)
-end_time = Sys.time()
-end_time - start_time
+
+mlm1 <- lmer(
+  t4seins ~ content_prep * pedagogy_prep +
+    tt4g24a + tt4g24b + t4tyexptt + t4tagegr +
+    tt4g04 + tt4g21a + tt4g21b +
+    (1 | cntry),
+  data = df_factor
+)
+
+tbl_regression(mlm1) %>%
+  add_significance_stars() %>% 
+  as_flex_table()
 
 # Two Level Model - Country - best fit model by AIC and BIC
 mlm2 <- lmer(formula = t4seins ~ as.numeric(tt4g07a)*as.numeric(tt4g07b) + t4tyexptt + t4tagegr + tt4g04 + tt4g21a + tt4g21b + (1|cntry),  data = df_factor) 
@@ -77,7 +85,7 @@ end_time - start_time
 
 # Two Level Model - Country - best fit model by AIC and BIC
 mlm3 <- lmer(formula = t4seins ~ as.numeric(tt4g07a)*as.numeric(tt4g07b) + t4tyexptt + t4tagegr + tt4g04 + tt4g21a + tt4g21b + (1|cntry),  data = df_factor) 
-mlm3 %>% tbl_regression() %>% add_glance_source_note() %>% as_flex_table()
+mlm3 %>% tbl_regression() %>% add_glance_source_note()
 summary(mlm1)
 end_time = Sys.time()
 end_time - start_time

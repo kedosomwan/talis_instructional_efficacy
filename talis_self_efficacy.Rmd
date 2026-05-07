@@ -83,7 +83,7 @@ tbl_regression(mlm1) %>%
 
 ```{r eval = FALSE}
 #subset data
-df_subset <- df_factor %>% select(idschool, idteach, cntry, t4seins, content_prep, pedagogy_prep, tt4g24a, tt4g24b, t4tyexptt, t4tagegr, tt4g49, tt4g21a, tt4g21b)
+df_subset <- df_factor %>% select(idschool, idteach, cntry, t4seins, content_prep, pedagogy_prep, tt4g24a, tt4g24b, t4tyexptt, t4tagegr, tt4g49, tt4g21a, tt4g21b, tt4g04)
 start_time <- Sys.time()
 df_imputed <- mice(df_subset, m = 20)
 end_time <- Sys.time()
@@ -100,7 +100,7 @@ library(gtsummary)
 
 # Two Level Model by Country - Instructional Self-Efficacy as Outcome
 
-mlm1_imp <- with(df_imp, lmer(t4seins ~ 
+mlm1_imp <- with(df_imputed, lmer(t4seins ~ 
                content_prep * pedagogy_prep + # content and pedagogy interaction
                tt4g24a + tt4g24b + # need for PD
                t4tyexptt + t4tagegr + tt4g04 +  # controls

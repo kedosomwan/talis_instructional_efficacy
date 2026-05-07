@@ -35,19 +35,18 @@ df <- df %>% filter(tt4g48a == 2)  %>% droplevels()
 
 # Subset Data
 ```{r}
-df_summ <- df %>% as_factor() %>% filter(tt4g48a== "Mathematics") %>% dplyr::select(idschool, idteach, t4seins, t4self, t4secls, cntry, tt4g49, tt4g07a, tt4g07b, tt4g04, t4tagegr, tt4g21a, tt4g21b, t4pdsubmp, starts_with("t4tyexp"), starts_with("trwgt")) %>%  mutate(instruct_eff = as.numeric(t4seins))
-                                                                                    #starts_with("tt4g47") for propotion of classes, 
-                                                                                   
-
+df_summ <- df %>% as_factor() %>% filter(tt4g48a== "Mathematics") %>% dplyr::select(idschool, idteach, t4seins, t4self, t4secls, cntry, tt4g49, tt4g07a, tt4g07b, tt4g04, t4tagegr, tt4g21a, tt4g21b, tt4g24a, tt4g24b, starts_with("t4tyexp"), starts_with("trwgt")) %>%  mutate(instruct_eff = as.numeric(t4seins))
+                                                                                    
 # drop missing outcomes
 df_summ <- df_summ %>% filter(!is.na(t4seins)) # only 50 missing
 
 # combine not at all and to some extent
 df_summ <- df_summ %>% mutate(content_prep = fct_collapse(tt4g07a, "Not at all / To some extent" = c("Not at all", "To some extent")),
-                    pedagogy_prep = fct_collapse(tt4g07b,"Not at all / To some extent" = c("Not at all", "To some extent")))
+                              pedagogy_prep = fct_collapse(tt4g07b,"Not at all / To some extent" = c("Not at all", "To some extent")))
 
 df_summ <- df_summ %>% mutate(content_prep = fct_collapse(tt4g07a, "Not at all / To some extent" = c("Not at all", "To some extent")),
-                    pedagogy_prep = fct_collapse(tt4g07b,"Not at all / To some extent" = c("Not at all", "To some extent"))) %>% dplyr::select(-tt4g07a, -tt4g07b)
+                              pedagogy_prep = fct_collapse(tt4g07b,"Not at all / To some extent" = c("Not at all", "To some extent"))) %>%
+  dplyr::select(-tt4g07a, -tt4g07b)
 ```
 
 # Descriptive Statistics

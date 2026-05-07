@@ -45,7 +45,7 @@ df_summ <- df_summ %>% mutate(content_prep = fct_collapse(tt4g07a, "Not at all /
                               pedagogy_prep = fct_collapse(tt4g07b,"Not at all / To some extent" = c("Not at all", "To some extent")))
 
 df_summ <- df_summ %>% mutate(content_prep = fct_collapse(tt4g07a, "Not at all / To some extent" = c("Not at all", "To some extent")),
-                              pedagogy_prep = fct_collapse(tt4g07b,"Not at all / To some extent" = c("Not at all", "To some extent"))) %>%
+                              pedagogy_prep = fct_collapse(tt4g07b,"Not at all / To some extent" = c("Not at all", "To some extent")))
 ```
 
 # Descriptive Statistics

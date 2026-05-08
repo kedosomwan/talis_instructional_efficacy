@@ -48,10 +48,113 @@ df_summ <- df_summ %>% mutate(content_prep = fct_collapse(tt4g07a, "Not at all /
                               pedagogy_prep = fct_collapse(tt4g07b,"Not at all / To some extent" = c("Not at all", "To some extent")))
 ```
 
-# Descriptive Statistics
+# Descriptive Statistics - Table
 ```{r}
 df_summ %>% dplyr::select(t4seins, content_prep, pedagogy_prep, tt4g24a, tt4g24b, t4tyexptt, t4tagegr, tt4g49, tt4g21a, tt4g21b, tt4g04) %>% tbl_summary(statistic = all_continuous() ~ "{mean} ({sd})") %>% as_flex_table()
 ```
+# Descriptive Statistics - Bar Chart
+```{r}
+library(tidyverse)
+library(scales)
+
+df_percent <- tribble(
+  ~Characteristic, ~Response, ~Percent,
+  
+  # Prepared for teaching content
+  "Prepared for teaching content", "Not at all / To some extent", 17,
+  "Prepared for teaching content", "Quite a bit",                35,
+  "Prepared for teaching content", "A lot",                      48,
+  
+  # Prepared for teaching pedagogy
+  "Prepared for teaching pedagogy", "Not at all / To some extent", 26,
+  "Prepared for teaching pedagogy", "Quite a bit",                43,
+  "Prepared for teaching pedagogy", "A lot",                      32,
+  
+  # PL needs: subject knowledge
+  "PL needs: subject knowledge", "No need at present", 28,
+  "PL needs: subject knowledge", "Low level of need",   33,
+  "PL needs: subject knowledge", "Moderate level of need", 25,
+  "PL needs: subject knowledge", "High level of need",  14,
+  
+  # PL needs: pedagogy
+  "PL needs: pedagogy", "No need at present", 19,
+  "PL needs: pedagogy", "Low level of need",   32,
+  "PL needs: pedagogy", "Moderate level of need", 32,
+  "PL needs: pedagogy", "High level of need",  16,
+  
+  # Years of experience
+  "Years of experience", "≤ 5 years", 19,
+  "Years of experience", "6–10 years", 16,
+  "Years of experience", "11–20 years", 28,
+  "Years of experience", "> 20 years", 37,
+  
+  # Teacher age
+  "Teacher age", "< 29", 12,
+  "Teacher age", "30–39",    26,
+  "Teacher age", "40–49",    29,
+  "Teacher age", "50–59",    24,
+  "Teacher age", ">= 60", 9,
+  
+  # Mathematics training
+  "Mathematics training", "Yes", 82,
+  "Mathematics training", "Somewhat", 12,
+  "Mathematics training", "No", 5.9
+)
+
+df$Response <- factor(df_percent$Response,
+  levels = c(
+    "Not at all / To some extent", "No need at present",
+    "Low level of need", "Moderate level of need",
+    "Quite a bit", "A lot", "High level of need",
+    "≤ 5 years", "6–10 years", "11–20 years", "> 20 years",
+    "< 29", "30–39", "40–49", "50–59", ">= 60",
+    "No", "Somewhat", "Yes"
+  )
+)
+```
+
+```{r}
+library(tidyverse)
+library(scales)
+library(stringr)
+
+ggplot(df_percent,
+       aes(x = Characteristic,
+           y = Percent,
+           fill = Response)) +
+  geom_bar(stat = "identity", width = 0.7) +
+  
+  # Wrapped labels INSIDE bars
+  geom_text(
+    aes(
+      label = paste0(
+        str_wrap(Response, width = 16),  # <-- automatic wrapping
+        "\n", Percent, "%"
+      )
+    ),
+    position = position_stack(vjust = 0.5),
+    color = "white",
+    size = 3,
+    lineheight = 0.95
+  ) +
+  
+  scale_y_continuous(
+    labels = label_percent(scale = 1),
+    expand = expansion(mult = c(0, 0.02))
+  ) +
+  labs(
+    x = NULL,
+    y = "Percentage of teachers"
+  ) +
+  coord_flip() +   # strongly recommended for readability
+  theme_minimal(base_size = 12) +
+  theme(
+    legend.position = "none"
+  )
+```
+
+
+
 # Preliminary Analysis
 ```{r}
 library(lmerTest)
